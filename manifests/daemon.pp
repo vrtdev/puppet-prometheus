@@ -70,8 +70,6 @@ define prometheus::daemon (
   $manage_user        = true,
   $extra_groups       = [],
   $manage_group       = true,
-  $purge              = true,
-  $options            = '',
   $init_style         = $::prometheus::params::init_style,
   $service_ensure     = 'running',
   $service_enable     = true,
