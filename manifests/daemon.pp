@@ -33,7 +33,7 @@
 #  The binary package name
 #
 #  [*package_ensure*]
-#  If package, then use this for package ensure default 'undef'
+#  If package, then use this for package ensure default 'installed'
 #
 #  [*manage_user*]
 #  Whether to create user or rely on external code for that
@@ -66,7 +66,7 @@ define prometheus::daemon (
   $arch               = $::prometheus::params::arch,
   $bin_dir            = $::prometheus::params::bin_dir,
   $package_name       = undef,
-  $package_ensure     = undef,
+  $package_ensure     = 'installed',
   $manage_user        = true,
   $extra_groups       = [],
   $manage_group       = true,
