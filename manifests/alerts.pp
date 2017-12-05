@@ -14,9 +14,8 @@ class prometheus::alerts (
   String $alertfile_name  = 'alert.rules'
 ) inherits prometheus::params {
 
-  if ( versioncmp($::prometheus::version, '2.0.0') < 0 ){
-
-    if $alerts != [] {
+  if $alerts != [] and $alerts != {} {
+    if ( versioncmp($::prometheus::version, '2.0.0') < 0 ){
 
       file { "${location}/${alertfile_name}":
         ensure  => 'file',
@@ -27,17 +26,16 @@ class prometheus::alerts (
       }
 
     }
+    else {
 
-  }
-  else {
+      file { "${location}/${alertfile_name}":
+        ensure  => 'file',
+        owner   => $prometheus::user,
+        group   => $prometheus::group,
+        notify  => Class['::prometheus::service_reload'],
+        content => $alerts.to_yaml,
+      }
 
-    file { "${location}/${alertfile_name}":
-      ensure  => 'file',
-      owner   => $prometheus::user,
-      group   => $prometheus::group,
-      notify  => Class['::prometheus::service_reload'],
-      content => $alerts.to_yaml,
     }
-
   }
 }
