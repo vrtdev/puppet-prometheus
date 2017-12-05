@@ -6,22 +6,34 @@
 #  Whether to create the alert file for prometheus
 #
 #  [*alerts*]
-#  Array of alerts (see README)
+#  Array (< prometheus 2.0.0) or Hash (>= prometheus 2.0.0) of alerts (see README).
 #
 class prometheus::alerts (
   String $location,
-  Array  $alerts,
+  Variant[Array,Hash] $alerts = {},
   String $alertfile_name  = 'alert.rules'
 ) inherits prometheus::params {
 
-    if $alerts != [] {
-        file{ "${location}/${alertfile_name}":
-                ensure  => 'file',
-                owner   => $prometheus::user,
-                group   => $prometheus::group,
-                notify  => Class['::prometheus::service_reload'],
-                content => epp("${module_name}/alerts.epp"),
-        }
+  if ( versioncmp($::prometheus::version, '2.0.0') < 0 ){
+
+    file { "${location}/${alertfile_name}":
+      ensure  => 'file',
+      owner   => $prometheus::user,
+      group   => $prometheus::group,
+      notify  => Class['::prometheus::service_reload'],
+      content => epp("${module_name}/alerts.epp"),
     }
 
+  }
+  else {
+
+    file { "${location}/${alertfile_name}":
+      ensure  => 'file',
+      owner   => $prometheus::user,
+      group   => $prometheus::group,
+      notify  => Class['::prometheus::service_reload'],
+      content => $alerts.to_yaml,
+    }
+
+  }
 }
