@@ -10,18 +10,22 @@
 #
 class prometheus::alerts (
   String $location,
-  Variant[Array,Hash] $alerts = {},
+  Variant[Array,Hash] $alerts,
   String $alertfile_name  = 'alert.rules'
 ) inherits prometheus::params {
 
   if ( versioncmp($::prometheus::version, '2.0.0') < 0 ){
 
-    file { "${location}/${alertfile_name}":
-      ensure  => 'file',
-      owner   => $prometheus::user,
-      group   => $prometheus::group,
-      notify  => Class['::prometheus::service_reload'],
-      content => epp("${module_name}/alerts.epp"),
+    if $alerts != [] {
+
+      file { "${location}/${alertfile_name}":
+        ensure  => 'file',
+        owner   => $prometheus::user,
+        group   => $prometheus::group,
+        notify  => Class['::prometheus::service_reload'],
+        content => epp("${module_name}/alerts.epp"),
+      }
+
     }
 
   }
