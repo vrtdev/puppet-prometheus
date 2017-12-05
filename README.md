@@ -65,7 +65,7 @@ or simply:
 include ::prometheus
 ```
 
-To add alert rules, add the following to the class prometheus:
+To add alert rules, add the following to the class prometheus in case you are using prometheus < 2.0:
 ```puppet
     alerts => [{ 'name' => 'InstanceDown', 'condition' => 'up == 0', 'timeduration' => '5m', labels => [{ 'name' => 'severity', 'content' => 'page'}], 'annotations' => [{ 'name' => 'summary', content => 'Instance {{ $labels.instance }} down'}, {'name' => 'description', content => '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.' }]}]
 ```
@@ -89,6 +89,23 @@ alertrules:
                 name: 'description'
                 content: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
 
+```
+
+When using prometheus >= 2.0, we use the new yaml format (https://prometheus.io/docs/prometheus/2.0/migration/#recording-rules-and-alerts) configuration
+
+```yaml
+alerts:
+  groups:
+    - name: alert.rules
+      rules:
+      - alert: 'InstanceDown'
+        expr: 'up == 0'
+        for: '5m'
+        labels:
+          'severity': 'page'
+        annotations:
+          'summary': 'Instance {{ $labels.instance }} down'
+          'description': '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
 ```
 
 On the monitored nodes:
